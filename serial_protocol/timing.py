@@ -1,10 +1,11 @@
 from sched import scheduler
+import time
 
 
 class EventMinder:
     
-    def __init__(self):
-        self._sched = scheduler(delayfunc=self._delayfunc)
+    def __init__(self, *, timefunc=time.monotonic):
+        self._sched = scheduler(timefunc=timefunc, delayfunc=self._delayfunc)
     
     def _delayfunc(self, *args):
         delay = self._next_event_delay()
