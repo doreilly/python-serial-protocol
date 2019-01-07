@@ -265,8 +265,8 @@ class TestExampleMachine(unittest.TestCase):
             await self._init_connection(delay=0.05)
             c1 = self.client.send_request(get_command)
             c2 = self.client.send_request(set_command)
-            done, _ = await asyncio.wait((c1, c2), loop=self.loop)
-            return [c.result() for c in done]
+            await asyncio.wait((c1, c2), loop=self.loop)
+            return [c1.result(), c2.result()]
 
         results = self.loop.run_until_complete(runner())
         self.assertEqual(results[0].value, b'A')
