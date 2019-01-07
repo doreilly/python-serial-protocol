@@ -8,6 +8,8 @@ and uses an Class-based Event infrastructure for sending and matching commands.
 - [x] Asynchronous message handling for non-Request/Response information
       (e.g. Status messages)
 - [x] asyncio wrapper that provides a Future-based request/response interface
+- [x] RxPY wrapper that provides an Observable interface to the protocol
+      machine, and remains I/O agnostic.
 
 # Components
 
@@ -93,4 +95,32 @@ transport, protocol = await asyncio.get_event_loop().create_connection(
     12345)
 
 response = await protocol.send_request(Request(b'Hello'))
+```
+
+# RxPY integration
+
+Included in the package is the `rx` module that includes an Rx wrapper around
+the EventMachine/EventMinder interface. I/O is still in the domain of the
+hosting application. The application must also provide the Rx scheduler instance
+for handling the timeouts, etc.
+
+```
+import rx
+from serial_protocol.rx import RxSerialProtocol
+
+from .events import Event, Request
+
+
+def event_for_data(data, requests):
+    return (Event(data), list(requests)[0])
+
+
+scheduler = rx.concurrency.ThreadPoolScheduler()
+
+protocol = RxSerialProtocol(event_for_data, scheduler)
+
+protocol.send_request(Request(b'Hello')).subscribe(
+    on_next=lambda resp: print(resp))
+
+...
 ```
