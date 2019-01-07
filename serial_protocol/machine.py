@@ -18,7 +18,7 @@ class EventMachine:
         if request:
             self._completed(request)
             self.delegate.request_completed(request, event)
-        else:
+        elif event:
             self.delegate.event_received(event)
         
         return event
